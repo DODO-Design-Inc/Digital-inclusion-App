@@ -1,26 +1,171 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.cdnfonts.com/css/helvetica-neue-55");
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
+
 @import "tailwindcss";
+@import "material-symbols/outlined.css";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* @font-face {
+  font-family: "Helvetica Neue";
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("/fonts/HelveticaNeue-Roman.otf");
+}
+@font-face {
+  font-family: "Helvetica Neue bold";
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("/fonts/HelveticaNeueBold.otf");
+}
+@font-face {
+  font-family: "Helvetica Neue medium";
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("/fonts/HelveticaNeueMedium.otf");
+}
+@font-face {
+  font-family: "Helvetica Neue light";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/HelveticaNeue-Light.otf");
+} */
+
+@font-face {
+  font-family: "HM Custom";
+  src: url("/fonts/HelveticaNeue-Light.otf");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HM Custom";
+  src: url("/fonts/HelveticaNeue-Roman.otf");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HM Custom";
+  src: url("/fonts/HelveticaNeueMedium.otf");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HM Custom";
+  src: url("/fonts/HelveticaNeueBold.otf");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* --color-*: initial; */
+  --color-dodo-yellow: #f1b130;
+  --color-dodo-grey-2: #f7f7f7;
+  --color-dodo-grey-3: #656e76;
+  --color-dodo-black: #1d2328;
+  --color-black: #34393e;
+  --color-black-70: #616569;
+  --color-text: #a5a7a9;
+  --color-text-2: #959595;
+
+  /* --font-*:inital */
+  --font-inter: "Inter", sans-serif;
+  --font-ibm: "IBM Plex Serif";
+  --font-helvetica: "HM Custom", sans-serif;
+  --font-lora: "Lora", sans-serif;
+  --font-helvetica-bold: "HM Custom bold", sans-serif;
+  --font-helvetica-medium: "HM Custom medium", sans-serif;
+  --font-helvetica-thin: "HM Custom light", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  /* :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-  }
+  } */
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* body {
+} */
+/* Add this to your global CSS */
+html {
+  scroll-behavior: smooth;
+  scroll-snap-stop: always;
+  -webkit-font-smoothing: antialiased; /* Chrome/Safari */
+  -moz-osx-font-smoothing: grayscale; /* Firefox on macOS */
+  /* font-smooth: always; */
+}
+
+.hover-only {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.group:hover .hover-only {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.project-content {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  background: #f7f7f7;
+  /* display: none; */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #f1b130;
+  border-radius: 14px;
+}
+
+img {
+  border-radius: 0 !important;
+}
+
+/* In your global CSS */
+::placeholder {
+  color: #34393e;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #34393e;
+}
+
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #34393e;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+/* .loraFont{
+  font-family: var(--font-lora);
+} */
+
+.fontHelvetica {
+  font-family: "HM Custom", Helvetica, Arial, sans-serif;
 }
