@@ -6,12 +6,14 @@ import { AllContextProvider } from "@/context/allContext";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import React from "react";
 import { Metadata } from "next";
+import StrategicCallWrapper from "@/components/StrategicCallWrapper";
 
 export const metadata: Metadata = {
   title: "Voices Of 500 Women",
   description: "Voices Of 500 Women",
   icons: {
-    icon: "/icon.png", // this ensures your icon replaces Vercel's favicon
+    icon: "/icon.png",
+    shortcut: "/icon.png",
   },
 };
 
@@ -61,10 +63,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
-              url: "https://dododesign.africa/",
-              logo: "/icon.png",
-              name: "Dodo Design Africa",
+              "@type": "Organization"
             }),
           }}
         />
@@ -72,6 +71,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
 
       <body>
         <main className="font-inter tracking-[-0.03em]">
+        <StrategicCallWrapper />
           <AllContextProvider>
             <NavBar />
             <main>{children}</main>
