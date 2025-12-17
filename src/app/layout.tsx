@@ -1,12 +1,14 @@
+// app/layout.tsx
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { AllContextProvider } from "@/context/allContext";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import React from "react";
-import { html } from "framer-motion/client";
+import { Metadata } from "next";
+import StrategicCallWrapper from "@/components/StrategicCallWrapper";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Voices Of 500 Women",
   description: "Voices Of 500 Women",
   icons: {
@@ -14,24 +16,18 @@ export const metadata = {
     shortcut: "/icon.png",
   },
 };
+
 const isProduction = process.env.NODE_ENV === "production";
 
 export default function RootLayout({ children }: React.PropsWithChildren) {
   return (
-    <html>
+    <html lang="en">
       <head>
+        {/* Preload custom fonts */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
           rel="stylesheet"
         />
-        <link rel="icon" href="/favicon_new.ico" sizes="any" />
-        <link
-          rel="icon"
-          type="image/png"
-          href="/favicon_new.png"
-          sizes="512x512"
-        />
-        <link rel="icon" type="image/svg+xml" href="/favicon_new.svg" />
         <link
           rel="preload"
           href="/fonts/HelveticaNeue-Light.otf"
@@ -61,15 +57,13 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           crossOrigin="anonymous"
         />
 
+        {/* Structured data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
-              url: "https://dododesign.africa/",
-              logo: "https://dododesign.africa/favicon.svg",
-              name: "Dodo Design Africa",
+              "@type": "Organization"
             }),
           }}
         />
@@ -77,6 +71,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
 
       <body>
         <main className="font-inter tracking-[-0.03em]">
+        <StrategicCallWrapper />
           <AllContextProvider>
             <NavBar />
             <main>{children}</main>

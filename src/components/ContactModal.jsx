@@ -1,12 +1,18 @@
 "use client";
+
 import { useEffect, useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import Input from "./Input";
+
 
 const ContactModal = ({ isOpen, onClose }) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [checkBox, setCheckBox] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -27,18 +33,30 @@ const ContactModal = ({ isOpen, onClose }) => {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-  
-    const { firstName, lastName, jobTitle, emailAddress, organization } = formData;
-  
-    // Validation
-    if (!firstName || !lastName || !jobTitle || !emailAddress || !organization)
+
+    const { firstName, lastName, jobTitle, emailAddress, organization } =
+      formData;
+
+    // Basic validation
+    if (
+      !firstName ||
+      !lastName ||
+      !jobTitle ||
+      !emailAddress ||
+      !organization
+    )
       return;
-  
+
     if (!emailRegex.test(emailAddress)) return;
-  
+
+    if (!captchaToken) {
+      alert("Please verify that you are not a robot.");
+      return;
+    }
+
     setLoading(true);
     setSubmitted(false);
-  
+
     try {
       const res = await fetch("/api/sendform", {
         method: "POST",
@@ -46,23 +64,24 @@ const ContactModal = ({ isOpen, onClose }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          firstName,
-          lastName,
-          jobTitle,
-          emailAddress,
-          organization,
+          ...formData,
           agreed: checkBox,
-        }), 
+          captchaToken,
+        }),
       });
-  
+
       const data = await res.json();
-  
-      console.log("Server response:", data);
-  
-      setLoading(false);
+
+      if (!res.ok) {
+        alert(data.error || "Submission failed");
+        setLoading(false);
+        return;
+      }
+
       setSubmitted(true);
-  
-      // Reset after animation
+      setLoading(false);
+
+      // Reset form after animation
       setTimeout(() => {
         setFormData({
           firstName: "",
@@ -72,22 +91,24 @@ const ContactModal = ({ isOpen, onClose }) => {
           organization: "",
         });
         setCheckBox(false);
+        setCaptchaToken(null);
       }, 1500);
-  
     } catch (error) {
       console.error("Submit error:", error);
       setLoading(false);
     }
   };
-  
-  // Close on ESC key
+
+  // Close on ESC
   useEffect(() => {
-    const handleEscape = (e) => e.key === "Escape" && onClose();
+    const handleEscape = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
-  // Lock body scroll when modal is open
+  // Lock body scroll
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
   }, [isOpen]);
@@ -100,9 +121,9 @@ const ContactModal = ({ isOpen, onClose }) => {
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
-      ></div>
+      />
 
-      {/* Modal container */}
+      {/* Modal */}
       <div
         className="
           relative bg-white shadow-lg z-10 animate-fadeIn
@@ -113,7 +134,7 @@ const ContactModal = ({ isOpen, onClose }) => {
       >
         {/* Close button */}
         <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 cursor-pointer font-[700]"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold"
           onClick={onClose}
         >
           ✕
@@ -124,24 +145,20 @@ const ContactModal = ({ isOpen, onClose }) => {
         </h3>
 
         <form className="mt-[28px] space-y-[28px]" onSubmit={onSubmitForm}>
-          {/* Name Fields */}
-          <div className="flex flex-col md:flex-row justify-between gap-[28px]">
-            <div className="w-full md:w-[48%]">
-              <Input
-                label="FIRST NAME"
-                value={formData.firstName}
-                inputname="firstName"
-                onChange={onChangeFormData}
-              />
-            </div>
-            <div className="w-full md:w-[48%]">
-              <Input
-                label="LAST NAME"
-                value={formData.lastName}
-                inputname="lastName"
-                onChange={onChangeFormData}
-              />
-            </div>
+          {/* Name */}
+          <div className="flex flex-col md:flex-row gap-[28px]">
+            <Input
+              label="FIRST NAME"
+              value={formData.firstName}
+              inputname="firstName"
+              onChange={onChangeFormData}
+            />
+            <Input
+              label="LAST NAME"
+              value={formData.lastName}
+              inputname="lastName"
+              onChange={onChangeFormData}
+            />
           </div>
 
           <Input
@@ -166,45 +183,50 @@ const ContactModal = ({ isOpen, onClose }) => {
             onChange={onChangeFormData}
           />
 
-          {/* Checkbox */}
+          {/* Agreement checkbox */}
           <div className="flex items-start gap-[10px]">
             <input
               type="checkbox"
               checked={checkBox}
               onChange={toggleCheckBox}
-              className="accent-black w-[22px] h-[22px] cursor-pointer shrink-0 mt-[4px]"
+              className="accent-black w-[22px] h-[22px] cursor-pointer mt-[4px]"
             />
-            <div className="text-[#1D2328] leading-[120%] text-[18px] sm:text-[20px]">
+            <p className="text-[#1D2328] text-[18px] leading-[120%]">
               I agree to DODO collecting my personal information in order to
               receive updates and communications.
-            </div>
+            </p>
           </div>
 
-          {/* Submit Button */}
-          <div className="w-full mt-[32px]">
-            <button
-              type="submit"
-              disabled={loading || submitted}
-              className={`
-                relative w-full h-[60px] sm:h-[72px] 
-                text-[18px] sm:text-[19px] font-medium 
-                transition-all duration-300 overflow-hidden
-                ${
-                  submitted
-                    ? "bg-slate-600 text-white"
-                    : loading
-                    ? "bg-[#34393E] text-white animate-pulse"
-                    : "bg-[#1D2328] text-white hover:bg-[#34393E]"
-                }
-              `}
-            >
-              {loading
-                ? "SUBMITTING..."
-                : submitted
-                ? "SUBMITTED"
-                : "SUBMIT"}
-            </button>
-          </div>
+          {/* CAPTCHA */}
+          <ReCAPTCHA
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+            onChange={(token) => setCaptchaToken(token)}
+            onExpired={() => setCaptchaToken(null)}
+          />
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading || submitted}
+            className={`
+              w-full h-[60px] sm:h-[72px]
+              text-[18px] font-medium transition-all
+              ${
+                submitted
+                  ? "bg-slate-600"
+                  : loading
+                  ? "bg-[#34393E] animate-pulse"
+                  : "bg-[#1D2328] hover:bg-[#34393E]"
+              }
+              text-white
+            `}
+          >
+            {loading
+              ? "SUBMITTING..."
+              : submitted
+              ? "SUBMITTED"
+              : "SUBMIT"}
+          </button>
         </form>
       </div>
     </div>

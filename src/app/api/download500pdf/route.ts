@@ -1,24 +1,59 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
-  // 1. Get the email from the request body
-  let body: { email: string };
+  // 1. Parse request body
+  let body: { email: string; token: string };
+
   try {
     body = await request.json();
+
     if (!body.email) {
       return NextResponse.json(
         { error: "Email is required" },
         { status: 400 }
       );
     }
-  } catch (error) {
+
+    if (!body.token) {
+      return NextResponse.json(
+        { error: "reCAPTCHA token is required" },
+        { status: 400 }
+      );
+    }
+  } catch {
     return NextResponse.json(
       { error: "Invalid request body" },
       { status: 400 }
     );
   }
 
-  // 2. Get your "secrets" from environment variables
+  // 2. Verify reCAPTCHA with Google
+  try {
+    const googleRes = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${body.token}`,
+      }
+    );
+
+    const googleData = await googleRes.json();
+
+    if (!googleData.success) {
+      return NextResponse.json(
+        { error: "Failed reCAPTCHA verification" },
+        { status: 400 }
+      );
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "reCAPTCHA verification failed" },
+      { status: 500 }
+    );
+  }
+
+  // 3. Get Mailchimp credentials
   const apiKey = process.env.MAILCHIMP_API_KEY;
   const audienceId = process.env.MAILCHIMP_500_AUDIENCE_ID;
   const serverPrefix = process.env.MAILCHIMP_SERVER;
@@ -30,22 +65,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 3. Construct the Mailchimp API URL
+  // 4. Mailchimp endpoint
   const url = `https://${serverPrefix}.api.mailchimp.com/3.0/lists/${audienceId}/members`;
 
-  // 4. Create the data payload for Mailchimp
   const data = {
     email_address: body.email,
     status: "subscribed" as const,
     tags: ["500 voices of women"],
   };
 
-  // 5. Send the request to Mailchimp
+  // 5. Send to Mailchimp
   try {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        // Mailchimp uses Basic Auth. Username can be anything, password is the API key.
         Authorization: `Basic ${Buffer.from(`anystring:${apiKey}`).toString(
           "base64"
         )}`,
@@ -54,39 +87,36 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(data),
     });
 
-    // 6. Handle the response from Mailchimp
     if (response.ok) {
-      // Success
       const data = await response.json();
       return NextResponse.json({
         message: "Success! You are now subscribed.",
         data,
       });
-    } else {
-      // Handle errors
-      const errorData = await response.json();
-      // Check for a common error: Member Exists
-      if (errorData.title === "Member Exists") {
-        return NextResponse.json(
-          { error: "You are already subscribed." },
-          { status: 400 }
-        );
-      }
-      // Other Mailchimp errors
+    }
+
+    const errorData = await response.json();
+
+    if (errorData.title === "Member Exists") {
       return NextResponse.json(
-        {
-          error:
-            errorData.detail ||
-            "Something went wrong. Please try again later.",
-        },
-        { status: response.status }
+        { error: "You are already subscribed." },
+        { status: 400 }
       );
     }
+
+    return NextResponse.json(
+      {
+        error:
+          errorData.detail ||
+          "Something went wrong. Please try again later.",
+      },
+      { status: response.status }
+    );
   } catch (error) {
-    // Handle fetch or other network errors
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
     return NextResponse.json(
       { error: "An unknown error occurred." },
       { status: 500 }

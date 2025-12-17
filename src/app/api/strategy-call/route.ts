@@ -9,24 +9,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
 
-  const {
-    firstName,
-    lastName,
-    jobTitle,
-    emailAddress,
-    organization,
-    agreed,
-    captchaToken,
-  } = body;
+  const { fullName, emailAddress, phoneNumber, captchaToken } = body;
 
-  if (
-    !firstName ||
-    !lastName ||
-    !jobTitle ||
-    !emailAddress ||
-    !organization ||
-    !captchaToken
-  ) {
+  if (!fullName || !emailAddress || !phoneNumber || !captchaToken) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -77,13 +62,10 @@ export async function POST(request: NextRequest) {
     email_address: emailAddress,
     status: "subscribed",
     merge_fields: {
-      FNAME: firstName,
-      LNAME: lastName,
-      JOB: jobTitle,
-      ORG: organization,
-      AGREED: agreed ? "YES" : "NO",
+      FNAME: fullName,
+      PHONE: phoneNumber,
     },
-    tags: ["Contact Form"],
+    tags: ["Strategic Discovery Call"],
   };
 
   const response = await fetch(url, {
@@ -114,3 +96,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ message: "Form submitted successfully" });
 }
+
+
