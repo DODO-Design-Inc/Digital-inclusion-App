@@ -9,7 +9,7 @@ const StrategicCallWrapper = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 15000);
+    }, 12000);
 
     return () => clearTimeout(timer);
   }, []);

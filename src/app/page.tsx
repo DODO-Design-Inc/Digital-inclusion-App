@@ -174,7 +174,7 @@ export default function Page() {
 
       <section className="snap_section font-helvetica flex flex-col md:flex-row w-full gap-0 md:h-[300px] lg:h-[429px] text-[#1D2328] text-[32px] xl:text-[48px] tracking-[-0.96px] xl:tracking-[-1.44px] leading-[150%] font-medium">
         <Link
-          href="/voices-of-500-women/#healthtech"
+          href="#healthtech"
           className="group flex items-center justify-center md:block h-[140px] md:h-full bg-[#BF4804] pt-0 md:pt-[100px] text-center w-full md:w-1/4"
         >
           <span className="font-helvetica-semi_medium">Healthtech</span>
@@ -200,7 +200,7 @@ export default function Page() {
           </div>
         </Link>
         <Link
-          href="/voices-of-500-women/#ecommerce"
+          href="#ecommerce"
           className="group bg-[#F2BA0F] flex items-center justify-center md:block h-[140px] md:h-full pt-0 md:pt-[100px] text-center w-full md:w-1/4"
         >
           <span className="font-helvetica-semi_medium">E-commerce</span>
@@ -226,7 +226,7 @@ export default function Page() {
           </div>
         </Link>
         <Link
-          href="/voices-of-500-women/#edtech"
+          href="#edtech"
           className="group bg-[#D97A06] flex items-center justify-center md:block h-[140px] md:h-full pt-0 md:pt-[100px] text-center w-full md:w-1/4"
         >
           <span className="font-helvetica-semi_medium">Edtech</span>
@@ -252,7 +252,7 @@ export default function Page() {
           </div>
         </Link>
         <Link
-          href="/voices-of-500-women/#fintech"
+          href="#fintech"
           className="group bg-[#BF4142] flex items-center justify-center md:block h-[140px] md:h-full pt-0 md:pt-[100px] text-center w-full md:w-1/4"
         >
           <span className="font-helvetica-semi_medium">Fintech</span>
