@@ -97,7 +97,7 @@ const StrategicCallModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[1000] flex items-center justify-center">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"
         onClick={onClose}
       />
 
